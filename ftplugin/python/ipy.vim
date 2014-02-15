@@ -18,7 +18,7 @@
 "
 " written by Paul Ivanov (http://pirsquared.org)
 "
-if !has('python')
+if !has('python3')
     " exit if python is not available.
     " XXX: raise an error message here
     finish
@@ -41,13 +41,12 @@ if !exists('g:ipy_completefunc')
     let g:ipy_completefunc = 'global'
 endif
 
-python << EOF
+python3 << EOF
 import vim
 import sys
 vim_ipython_path = vim.eval("expand('<sfile>:h')")
 sys.path.append(vim_ipython_path)
 from vim_ipython import *
-
 EOF
 
 fun! <SID>toggle_send_on_save()
@@ -77,7 +76,7 @@ endfun
 " buffer we may have opened up doesn't get closed just because of an idle
 " event (i.e. user pressed \d and then left the buffer that popped up, but
 " expects it to stay there).
-au CursorHold *.*,vim-ipython :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on idle)",'Operator')
+au CursorHold *.*,vim-ipython :python3 if update_subchannel_msgs(): echo("vim-ipython shell updated (on idle)",'Operator')
 
 " XXX: broken - cursor hold update for insert mode moves the cursor one
 " character to the left of the last character (update_subchannel_msgs must be
@@ -85,11 +84,11 @@ au CursorHold *.*,vim-ipython :python if update_subchannel_msgs(): echo("vim-ipy
 "au CursorHoldI *.* :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on idle)",'Operator')
 
 " Same as above, but on regaining window focus (mostly for GUIs)
-au FocusGained *.*,vim-ipython :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on input focus)",'Operator')
+au FocusGained *.*,vim-ipython :python3 if update_subchannel_msgs(): echo("vim-ipython shell updated (on input focus)",'Operator')
 
 " Update vim-ipython buffer when we move the cursor there. A message is only
 " displayed if vim-ipython buffer has been updated.
-au BufEnter vim-ipython :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on buffer enter)",'Operator')
+au BufEnter vim-ipython :python3 if update_subchannel_msgs(): echo("vim-ipython shell updated (on buffer enter)",'Operator')
 
 " Setup plugin mappings for the most common ways to interact with ipython.
 noremap  <Plug>(IPython-RunFile)            :python run_this_file()<CR>
@@ -144,15 +143,15 @@ if g:ipy_perform_mappings != 0
     xnoremap <buffer> <silent> <M-C>      :s/^\([ \t]*\)#/\1/<CR>
 endif
 
-command! -nargs=* IPython :py km_from_string("<args>")
-command! -nargs=0 IPythonClipboard :py km_from_string(vim.eval('@+'))
-command! -nargs=0 IPythonXSelection :py km_from_string(vim.eval('@*'))
-command! -nargs=* IPythonNew :py new_ipy("<args>")
-command! -nargs=* IPythonInterrupt :py interrupt_kernel_hack("<args>")
-command! -nargs=0 IPythonTerminate :py terminate_kernel_hack()
+command! -nargs=* IPython :python3 km_from_string("<args>")
+command! -nargs=0 IPythonClipboard :python3 km_from_string(vim.eval('@+'))
+command! -nargs=0 IPythonXSelection :python3 km_from_string(vim.eval('@*'))
+command! -nargs=* IPythonNew :python3 new_ipy("<args>")
+command! -nargs=* IPythonInterrupt :python3 interrupt_kernel_hack("<args>")
+command! -nargs=0 IPythonTerminate :python3 terminate_kernel_hack()
 
 function! IPythonBalloonExpr()
-python << endpython
+python3 << endpython
 word = vim.eval('v:beval_text')
 reply = get_doc(word)
 vim.command("let l:doc = %s"% reply)
@@ -169,14 +168,14 @@ fun! CompleteIPython(findstart, base)
           let start -= 1
         endwhile
         echo start
-        python << endpython
+        python3 << endpython
 current_line = vim.current.line
 endpython
         return start
       else
         " find months matching with "a:base"
         let res = []
-        python << endpython
+        python3 << endpython
 base = vim.eval("a:base")
 findstart = vim.eval("a:findstart")
 matches = ipy_complete(base, current_line, vim.eval("col('.')"))

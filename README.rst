@@ -2,9 +2,9 @@
 vim-ipython
 ###########
 
-A two-way integration between Vim and IPython.
+A two-way integration between Vim and IPython/Jupyter.
 
-IPython versions 0.11.x, 0.12.x, 0.13.x, 1.x, 2.x and 3.x
+IPython/Jupyter versions 0.11.x, 0.12.x, 0.13.x, 1.x, 2.x, 3.x, 4.x
 
 * author: Paul Ivanov (http://pirsquared.org)
 * github: http://github.com/ivanov/vim-ipython
@@ -294,6 +294,7 @@ pull request with your attribution.
 * @pydave for IPythonTerminate (sending SIGTERM using our hack)
 * @luispedro for IPythonNew
 * @jjhelmus and @wmvanvliet for IPython 3.x support.
+* @jjhelmus and @deto for IPython/Jupyter 4.x support.
 
 Similar Projects
 ----------------

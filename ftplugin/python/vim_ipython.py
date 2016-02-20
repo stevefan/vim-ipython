@@ -244,7 +244,10 @@ def disconnect():
 def get_doc(word, level=0):
     if kc is None:
         return ["Not connected to IPython, cannot query: %s" % word]
-    msg_id = kc.shell_channel.object_info(word, level)
+    if hasattr(kc, 'inspect'):  # IPython/Jupyter 4.x
+        msg_id = kc.inspect(word, None, level)
+    else:  # IPython <= 3
+        msg_id = kc.shell_channel.object_info(word, level)
     doc = get_doc_msg(msg_id)
     # get around unicode problems when interfacing with vim
     return [d.encode(vim_encoding) for d in doc]

@@ -93,7 +93,10 @@ def new_ipy(s=''):
         new_ipy()
 
     """
-    from IPython.kernel import KernelManager
+    try:
+        from jupyter_client import KernelManager
+    except ImportError:  # for compatability with IPython 3 or lower
+        from IPython.kernel import KernelManager
     km = KernelManager()
     km.start_kernel()
     return km_from_string(km.connection_file)
@@ -107,21 +110,26 @@ def km_from_string(s=''):
         import IPython
     except ImportError:
         raise ImportError("Could not find IPython. " + _install_instructions)
-    from IPython.config.loader import KeyValueConfigLoader
+
     try:
-        from IPython.kernel import (
-            KernelManager,
-            find_connection_file,
-        )
-    except ImportError:
-        #  IPython < 1.0
-        from IPython.zmq.blockingkernelmanager import BlockingKernelManager as KernelManager
-        from IPython.zmq.kernelapp import kernel_aliases
+        from traitlets.config.loader import KeyValueConfigLoader
+    except ImportError:  # IPython <= 3.0
+        from IPython.config.loader import KeyValueConfigLoader
+
+    try:
+        from jupyter_client import KernelManager, find_connection_file
+    except ImportError:  # IPython <= 3.0
         try:
-            from IPython.lib.kernel import find_connection_file
+            from IPython.kernel import KernelManager, find_connection_file
         except ImportError:
-            # < 0.12, no find_connection_file
-            pass
+            #  IPython < 1.0
+            from IPython.zmq.blockingkernelmanager import BlockingKernelManager as KernelManager
+            from IPython.zmq.kernelapp import kernel_aliases
+            try:
+                from IPython.lib.kernel import find_connection_file
+            except ImportError:
+                # < 0.12, no find_connection_file
+                pass
 
     global km, kc, send
 
@@ -142,7 +150,11 @@ def km_from_string(s=''):
                 p = p.lstrip().rstrip() # profile part of the string
                 fullpath = find_connection_file(k,p)
             else:
-                fullpath = find_connection_file(s.lstrip().rstrip())
+                s = s.lstrip().rstrip()
+                if len(s) == 0:
+                    fullpath = find_connection_file()
+                else:
+                    fullpath = find_connection_file(s.lstrip().rstrip())
         except IOError as e:
             echo(":IPython " + s + " failed", "Info")
             echo("^-- failed '" + s + "' not found", "Error")
